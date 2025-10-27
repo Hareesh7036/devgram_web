@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-// import { useDispatch } from "react-redux";
-// import { addUser } from "../utils/userSlice";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 
@@ -12,7 +12,7 @@ const Login = () => {
   const [lastName, setLastName] = useState("");
   const [isLoginForm, setIsLoginForm] = useState(true);
   const [error, setError] = useState("");
-  //   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -25,7 +25,7 @@ const Login = () => {
         },
         { withCredentials: true }
       );
-      //   dispatch(addUser(res.data));
+      dispatch(addUser(res.data));
       console.log(res.data);
       return navigate("/");
     } catch (err) {

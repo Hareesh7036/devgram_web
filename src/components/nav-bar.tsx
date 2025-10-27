@@ -1,4 +1,8 @@
+import { useSelector } from "react-redux";
+import type { RootState } from "../utils/appStore";
+
 function NavBar() {
+  const user = useSelector((store: RootState) => store.user);
   return (
     <div className="navbar bg-base-300 shadow-sm">
       <div className="flex-1">
@@ -12,10 +16,12 @@ function NavBar() {
             className="btn btn-ghost btn-circle avatar"
           >
             <div className="w-10 rounded-full">
-              <img
-                alt="Tailwind CSS Navbar component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              />
+              {!!user && (
+                <img
+                  alt="Tailwind CSS Navbar component"
+                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                />
+              )}
             </div>
           </div>
           <ul
