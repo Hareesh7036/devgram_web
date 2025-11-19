@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface UserState {
-  firstname: string;
-  lastname: string;
-  email: string;
+  firstName: string;
+  lastName: string;
+  emailId: string;
   _id: string;
   age?: number;
   gender?: string;
@@ -13,9 +13,9 @@ export interface UserState {
 }
 
 const initialState: UserState | null = {
-  firstname: "",
-  lastname: "",
-  email: "",
+  firstName: "",
+  lastName: "",
+  emailId: "",
   _id: "",
 };
 
@@ -28,9 +28,9 @@ const userSlice = createSlice({
     },
     removeUser: () => {
       return {
-        firstname: "",
-        lastname: "",
-        email: "",
+        firstName: "",
+        lastName: "",
+        emailId: "",
         _id: "",
       };
     },
