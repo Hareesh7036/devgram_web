@@ -18,7 +18,7 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:8080/login",
+        BASE_URL + "/login",
         {
           emailId,
           password,

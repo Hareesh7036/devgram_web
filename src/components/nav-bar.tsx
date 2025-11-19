@@ -10,7 +10,7 @@ function NavBar() {
       </div>
       {!!user && (
         <div className="flex gap-2 items-center">
-          <p>Welcome {user.firstname}!</p>
+          <p>Welcome {user.firstName}!</p>
           <div className="dropdown dropdown-end mx-4">
             <div
               tabIndex={0}
