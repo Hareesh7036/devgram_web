@@ -1,10 +1,11 @@
-import type { FeedUser } from "../utils/feedSlice";
+import type { User } from "../utils/userSlice";
 
 type Props = {
-  user: FeedUser;
+  user: User;
+  isProfileOverview?: boolean;
 };
 
-function UserCard({ user }: Props) {
+function UserCard({ user, isProfileOverview }: Props) {
   return (
     <div className="card bg-base-300 w-96 shadow-sm">
       <figure className="px-10 pt-10">
@@ -41,12 +42,14 @@ function UserCard({ user }: Props) {
             </div>
           )}
         </div>
-        <div className=" flex items-center text-center">
-          <div className="flex card-actions items-center">
-            <button className="btn btn-primary">Ignore</button>
-            <button className="btn btn-secondary">Interested</button>
+        {!isProfileOverview && (
+          <div className=" flex items-center text-center">
+            <div className="flex card-actions items-center">
+              <button className="btn btn-primary">Ignore</button>
+              <button className="btn btn-secondary">Interested</button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -41,14 +41,12 @@ const Login = () => {
 
   const handleSignUp = async () => {
     try {
-      const res = await axios.post(
+      await axios.post(
         BASE_URL + "/signup",
         { firstName, lastName, emailId, password },
         { withCredentials: true }
       );
-      console.log(res.data);
-      //   dispatch(addUser(res.data.data));
-      return navigate("/profile");
+      setIsLoginForm(true);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         // Safe to access response

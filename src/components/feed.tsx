@@ -26,7 +26,7 @@ function Feed() {
 
   return (
     <div className="flex justify-center p-6">
-      {feed.data.length && <UserCard user={feed.data[0]} />}
+      {!!feed.data.length && <UserCard user={feed.data[0]} />}
     </div>
   );
 }

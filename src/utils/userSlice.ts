@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface UserState {
+export interface User {
   firstName: string;
   lastName: string;
-  emailId: string;
-  _id: string;
+  emailId?: string;
+  _id?: string;
   age?: number;
   gender?: string;
   about?: string;
@@ -12,7 +12,7 @@ export interface UserState {
   photoUrl?: string;
 }
 
-const initialState: UserState | null = {
+const initialState: User | null = {
   firstName: "",
   lastName: "",
   emailId: "",

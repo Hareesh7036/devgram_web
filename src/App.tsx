@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import store from "./utils/appStore";
 import Profile from "./components/profile";
 import Feed from "./components/feed";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
   return (
