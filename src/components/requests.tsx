@@ -18,9 +18,32 @@ function Requests() {
       console.log(err);
     }
   };
+  const handleReviewRequest =
+    (action: string, requestId: string) => async () => {
+      try {
+        await axios.post(
+          BASE_URL + "/request/review/" + action + "/" + requestId,
+          {},
+          {
+            withCredentials: true,
+          }
+        );
+        getRequests();
+      } catch (err) {
+        console.log(err);
+      }
+    };
   useEffect(() => {
     getRequests();
   }, []);
+
+  if (requests.data.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <h2 className="text-2xl font-semibold">No Requests</h2>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -46,8 +69,18 @@ function Requests() {
               )}
               {user.about && <p>{user.about}</p>}
               <div className="card-actions justify-end">
-                <button className="btn btn-primary">Reject</button>
-                <button className="btn btn-secondary">Accept</button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleReviewRequest("rejected", request._id)}
+                >
+                  Reject
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleReviewRequest("accepted", request._id)}
+                >
+                  Accept
+                </button>
               </div>
             </div>
           </div>
