@@ -7,6 +7,8 @@ import store from "./utils/appStore";
 import Profile from "./components/profile";
 import Feed from "./components/feed";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import Connections from "./components/connections";
+import Requests from "./components/requests";
 
 function App() {
   return (
@@ -18,7 +20,8 @@ function App() {
               <Route path="/" element={<Feed />} />
               <Route path="login" element={<Login />} />
               <Route path="profile" element={<Profile />} />
-              <Route path="signup" element={<div>Sign Up</div>} />
+              <Route path="connections" element={<Connections />} />
+              <Route path="requests" element={<Requests />} />
               <Route path="*" element={<div>404 Not Found</div>} />
             </Route>
           </Routes>
