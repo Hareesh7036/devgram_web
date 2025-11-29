@@ -33,18 +33,20 @@ function UserCard({ user, isProfileOverview }: Props) {
           }
           alt="User Photo"
           className="rounded-xl"
+          width={400}
+          height={400}
         />
       </figure>
       <div className="card-body flex gap-4">
         <div className="flex justify-center items-center text-center">
-          <h2 className="card-title">
+          <h2 className="card-title capitalize">
             {user.firstName} {user.lastName}
           </h2>
         </div>
         <div className="flex gap-4 flex-col">
-          {user.about && <p>{user.about}</p>}
+          {user.about && <p className="capitalize">{user.about}</p>}
           {user.age && (
-            <p>
+            <p className="capitalize">
               {user.age} years
               {user.gender && <span>, {user.gender}</span>}
             </p>
@@ -52,7 +54,7 @@ function UserCard({ user, isProfileOverview }: Props) {
           {user.skills && user.skills.length > 0 && (
             <div className="badge-group flex flex-wrap gap-2">
               {user.skills.map((skill, index) => (
-                <span key={index} className="badge badge-soft">
+                <span key={index} className="badge badge-soft capitalize">
                   {skill}
                 </span>
               ))}

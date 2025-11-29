@@ -34,25 +34,27 @@ function Connections() {
     <div>
       {connections.data.map((connection) => {
         return (
-          <div className="card card-side bg-base-300 shadow-sm w-1/2 mx-auto my-5 rounded-2xl">
-            <figure>
+          <div className="card card-side bg-base-300 shadow-sm w-1/2 mx-auto my-5 rounded-2xl flex">
+            <figure className="pl-[30px] py-[30px]">
               <img
                 src={connection.photoUrl}
                 alt="connection image"
                 className="w-48 h-48 rounded-2xl"
               />
             </figure>
-            <div className="card-body">
-              <h2 className="card-title">
+            <div className="card-body flex-1">
+              <h2 className="card-title capitalize">
                 {connection.firstName} {connection.lastName}
               </h2>
               {connection.age && (
-                <p>
+                <p className="capitalize">
                   Age: {connection.age},{" "}
                   {connection.gender && <span>{connection.gender}</span>}
                 </p>
               )}
-              {connection.about && <p>{connection.about}</p>}
+              {connection.about && (
+                <p className="capitalize">{connection.about}</p>
+              )}
               <div className="card-actions justify-end">
                 <button className="btn btn-warning">Remove</button>
               </div>

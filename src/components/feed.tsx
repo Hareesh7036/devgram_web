@@ -24,6 +24,13 @@ function Feed() {
     getFeed();
   }, []);
 
+  if (feed.data.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <h2 className="text-2xl font-semibold">No Feed Available</h2>
+      </div>
+    );
+  }
   return (
     <div className="flex justify-center p-6">
       {!!feed.data.length && <UserCard user={feed.data[0]} />}

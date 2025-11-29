@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { removeUser } from "../utils/userSlice";
+import { resetFeed } from "../utils/feedSlice";
 
 function NavBar() {
   const user = useSelector((store: RootState) => store.user);
@@ -13,6 +14,7 @@ function NavBar() {
     try {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
       dispatch(removeUser());
+      dispatch(resetFeed());
       navigate("/login");
     } catch (err) {
       console.log(err);
@@ -25,7 +27,9 @@ function NavBar() {
       </div>
       {!!user && (
         <div className="flex gap-2 items-center">
-          <p>Welcome {user.firstName}!</p>
+          {user.firstName && (
+            <p className="capitalize">Welcome {user.firstName}!</p>
+          )}
           <div className="dropdown dropdown-end mx-4">
             <div
               tabIndex={0}

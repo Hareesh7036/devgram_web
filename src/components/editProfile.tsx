@@ -76,7 +76,7 @@ const EditProfile = ({ user }: { user: User }) => {
         <div className="card bg-base-300 w-96 shadow-xl">
           <div className="card-body">
             <h2 className="card-title justify-center">Edit Profile</h2>
-            <div>
+            <div className="flex flex-col">
               <label className="form-control w-full max-w-xs my-2">
                 <div className="label">
                   <span className="label-text">First Name</span>
@@ -115,12 +115,17 @@ const EditProfile = ({ user }: { user: User }) => {
                   <span className="label-text">Gender</span>
                 </div>
                 <div className="dropdown">
-                  <div tabIndex={0} role="button" className="btn m-1">
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn w-full justify-between"
+                  >
                     {gender}
+                    <i className="fa-solid fa-angle-down" />
                   </div>
                   <ul
                     tabIndex={-1}
-                    className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                    className="dropdown-content menu bg-base-100 rounded-box z-1 w-full p-2 mt-1 shadow-sm"
                   >
                     <li className={gender === "male" ? "bg-base-300" : ""}>
                       <a onClick={() => setGender("male")}>Male</a>
@@ -163,7 +168,7 @@ const EditProfile = ({ user }: { user: User }) => {
                   <input
                     type="text"
                     value={skill}
-                    className="input input-bordered w-full max-w-xs"
+                    className="input input-bordered max-w-xs flex-1"
                     onChange={(e) => setSkill(e.target.value)}
                   />
                   <button className="btn btn-primary" onClick={handleAddSkill}>

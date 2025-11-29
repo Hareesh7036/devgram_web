@@ -50,24 +50,24 @@ function Requests() {
       {requests.data.map((request) => {
         const user = request.fromUserId;
         return (
-          <div className="card card-side bg-base-300 shadow-sm w-1/2 mx-auto my-5 rounded-2xl">
-            <figure>
+          <div className="card card-side bg-base-300 shadow-sm w-1/2 mx-auto my-5 rounded-2xl flex">
+            <figure className="pl-[30px] py-[30px]">
               <img
                 src={user.photoUrl}
                 alt="connection image"
                 className="w-48 h-48 rounded-2xl"
               />
             </figure>
-            <div className="card-body">
-              <h2 className="card-title">
+            <div className="card-body flex-1">
+              <h2 className="card-title capitalize">
                 {user.firstName} {user.lastName}
               </h2>
               {user.age && (
-                <p>
+                <p className="capitalize">
                   Age: {user.age}, {user.gender && <span>{user.gender}</span>}
                 </p>
               )}
-              {user.about && <p>{user.about}</p>}
+              {user.about && <p className="capitalize">{user.about}</p>}
               <div className="card-actions justify-end">
                 <button
                   className="btn btn-primary"
