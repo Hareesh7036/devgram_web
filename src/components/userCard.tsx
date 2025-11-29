@@ -1,4 +1,8 @@
+import axios from "axios";
 import type { User } from "../utils/userSlice";
+import { BASE_URL } from "../utils/constants";
+import { useDispatch } from "react-redux";
+import { removeUserFromFeed } from "../utils/feedSlice";
 
 type Props = {
   user: User;
@@ -6,6 +10,19 @@ type Props = {
 };
 
 function UserCard({ user, isProfileOverview }: Props) {
+  const dispatch = useDispatch();
+  const handleSendRequest = async (status: string, userId: string) => {
+    try {
+      await axios.post(
+        BASE_URL + "/request/send/" + status + "/" + userId,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(removeUserFromFeed(userId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
     <div className="card bg-base-300 w-96 shadow-sm">
       <figure className="px-10 pt-10">
@@ -42,11 +59,27 @@ function UserCard({ user, isProfileOverview }: Props) {
             </div>
           )}
         </div>
-        {!isProfileOverview && (
+        {!isProfileOverview && !!user._id && (
           <div className=" flex items-center text-center">
             <div className="flex card-actions items-center">
-              <button className="btn btn-primary">Ignore</button>
-              <button className="btn btn-secondary">Interested</button>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  if (!user._id) return;
+                  handleSendRequest("ignored", user._id);
+                }}
+              >
+                Ignore
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  if (!user._id) return;
+                  handleSendRequest("interested", user._id);
+                }}
+              >
+                Interested
+              </button>
             </div>
           </div>
         )}
