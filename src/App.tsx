@@ -9,6 +9,7 @@ import Feed from "./components/feed";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Connections from "./components/connections";
 import Requests from "./components/requests";
+import Premium from "./components/premium";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <Route path="profile" element={<Profile />} />
               <Route path="connections" element={<Connections />} />
               <Route path="requests" element={<Requests />} />
+              <Route path="premium" element={<Premium />} />
               <Route path="*" element={<div>404 Not Found</div>} />
             </Route>
           </Routes>
