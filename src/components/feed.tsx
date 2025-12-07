@@ -33,7 +33,18 @@ function Feed() {
   }
   return (
     <div className="flex justify-center p-6">
-      {!!feed.data.length && <UserCard user={feed.data[0]} />}
+      {!!feed.data.length && (
+        <div
+          key={feed.data[0]._id} // ← KEY FIX: unique key prevents remount
+          className="transform transition-all duration-1000 ease-out hover:scale-105"
+          style={{
+            transform: `translateY(0px) rotateX(0deg)`,
+            animation: "cardFlipUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+          }}
+        >
+          <UserCard user={feed.data[0]} />
+        </div>
+      )}
     </div>
   );
 }

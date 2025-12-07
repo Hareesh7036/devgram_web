@@ -24,7 +24,7 @@ function UserCard({ user, isProfileOverview }: Props) {
     }
   };
   return (
-    <div className="card bg-base-300 w-96 shadow-sm">
+    <div className="card bg-base-300 w-96 shadow-sm transform transition-all duration-1000 ease-out  will-change-transform">
       <figure className="px-10 pt-10">
         <img
           src={
@@ -37,9 +37,9 @@ function UserCard({ user, isProfileOverview }: Props) {
           height={400}
         />
       </figure>
-      <div className="card-body flex gap-4">
+      <div className="card-body flex gap-4 opacity-100 transition-all duration-800 ease-out">
         <div className="flex justify-center items-center text-center">
-          <h2 className="card-title capitalize">
+          <h2 className="card-title capitalize translate-y-0 transition-all duration-700 ease-out">
             {user.firstName} {user.lastName}
           </h2>
         </div>
@@ -52,9 +52,12 @@ function UserCard({ user, isProfileOverview }: Props) {
             </p>
           )}
           {user.skills && user.skills.length > 0 && (
-            <div className="badge-group flex flex-wrap gap-2">
+            <div className="badge-group flex flex-wrap gap-2 animate-fadeIn">
               {user.skills.map((skill, index) => (
-                <span key={index} className="badge badge-soft capitalize">
+                <span
+                  key={index}
+                  className="badge badge-soft capitalize animate-pulse"
+                >
                   {skill}
                 </span>
               ))}
@@ -63,9 +66,9 @@ function UserCard({ user, isProfileOverview }: Props) {
         </div>
         {!isProfileOverview && !!user._id && (
           <div className=" flex items-center text-center">
-            <div className="flex card-actions items-center">
+            <div className="flex card-actions items-center transform transition-all duration-300 hover:translate-y-[-2px]">
               <button
-                className="btn btn-primary"
+                className="btn btn-primary transition-all duration-200 hover:scale-105"
                 onClick={() => {
                   if (!user._id) return;
                   handleSendRequest("ignored", user._id);
@@ -74,7 +77,7 @@ function UserCard({ user, isProfileOverview }: Props) {
                 Ignore
               </button>
               <button
-                className="btn btn-secondary"
+                className="btn btn-secondary transition-all duration-200 hover:scale-105"
                 onClick={() => {
                   if (!user._id) return;
                   handleSendRequest("interested", user._id);
