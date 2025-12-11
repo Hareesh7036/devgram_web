@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setConnections } from "../utils/connectionSlice";
 import type { RootState } from "../utils/appStore";
+import { Link } from "react-router-dom";
 
 function Connections() {
   const connections = useSelector((store: RootState) => store.connections);
@@ -56,6 +57,9 @@ function Connections() {
                 <p className="capitalize">{connection.about}</p>
               )}
               <div className="card-actions justify-end">
+                <Link to={`/chat/${connection._id}`}>
+                  <button className="btn btn-primary">Chat</button>
+                </Link>
                 <button className="btn btn-warning">Remove</button>
               </div>
             </div>
