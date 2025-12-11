@@ -7,6 +7,6 @@ export function createSocketConnection() {
       withCredentials: true,
     });
   } else {
-    return io("/", { path: "/socket.io", withCredentials: true });
+    return io(BASE_URL, { path: "/socket.io", withCredentials: true });
   }
 }
