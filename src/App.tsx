@@ -11,11 +11,13 @@ import Connections from "./components/connections";
 import Requests from "./components/requests";
 import Premium from "./components/premium";
 import Chat from "./components/chat";
+import OnlineStatusTracker from "./components/online-status-tracker";
 
 function App() {
   return (
     <>
       <Provider store={store}>
+        <OnlineStatusTracker />
         <BrowserRouter basename="/">
           <Routes>
             <Route path="/" element={<Body />}>

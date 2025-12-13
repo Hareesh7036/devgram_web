@@ -5,6 +5,8 @@ import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { removeUser } from "../utils/userSlice";
 import { resetFeed } from "../utils/feedSlice";
+import { disconnectSocket } from "../utils/socketClient";
+import { clearOnlineUsers } from "../utils/onlineUsersSlice";
 
 function NavBar() {
   const user = useSelector((store: RootState) => store.user);
@@ -13,6 +15,8 @@ function NavBar() {
   const handleLogout = async () => {
     try {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
+      disconnectSocket();
+      dispatch(clearOnlineUsers());
       dispatch(removeUser());
       dispatch(resetFeed());
       navigate("/login");

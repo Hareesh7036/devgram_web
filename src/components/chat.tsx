@@ -4,7 +4,8 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import type { RootState } from "../utils/appStore";
-import { createSocketConnection } from "../utils/socket";
+import { getSocket } from "../utils/socketClient";
+import type { User } from "../utils/userSlice";
 
 type MessageType = {
   firstName: string | null;
@@ -16,8 +17,12 @@ const Chat = () => {
   const { targetUserId } = useParams();
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [targetUser, setTargetUser] = useState<User>();
   const user = useSelector((store: RootState) => store.user);
   const userId = user?._id;
+  const onlineUsers = useSelector((store: RootState) => store.onlineUsers);
+
+  const socket = getSocket();
 
   const fetchChatMessages = async () => {
     const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
@@ -39,40 +44,46 @@ const Chat = () => {
     );
     setMessages(chatMessages);
   };
+
+  const fetchTargetUser = async () => {
+    const targetUser = await axios.get(BASE_URL + "/user/" + targetUserId, {
+      withCredentials: true,
+    });
+    if (targetUser) {
+      setTargetUser(targetUser.data.data);
+    }
+  };
+
   useEffect(() => {
     fetchChatMessages();
+    fetchTargetUser();
   }, []);
 
   useEffect(() => {
     if (!userId) {
       return;
     }
-    const socket = createSocketConnection();
     // As soon as the page loaded, the socket connection is made and joinChat event is emitted
-    socket.emit("joinChat", {
+    socket?.emit("joinChat", {
       firstName: user.firstName,
       userId,
       targetUserId,
     });
 
-    socket.on(
+    socket?.on(
       "messageReceived",
       ({ firstName, lastName, text }: MessageType) => {
+        console.log("Message received:", { firstName, lastName, text });
         setMessages((messages) => [...messages, { firstName, lastName, text }]);
       }
     );
-    socket.on("errorMessage", ({ code, message }) => {
+    socket?.on("errorMessage", ({ code, message }) => {
       console.error(code, message);
     });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [userId, targetUserId]);
+  }, [userId, targetUserId, socket]);
 
   const sendMessage = () => {
-    const socket = createSocketConnection();
-    socket.emit("sendMessage", {
+    socket?.emit("sendMessage", {
       firstName: user.firstName,
       lastName: user.lastName,
       userId,
@@ -82,9 +93,31 @@ const Chat = () => {
     setNewMessage("");
   };
 
+  function isUserOnline(userId: string) {
+    return onlineUsers.data.includes(userId);
+  }
+
+  if (!targetUserId) return null;
+
   return (
     <div className="w-3/4 mx-auto border border-gray-600 m-5 h-[70vh] flex flex-col">
-      <h1 className="p-5 border-b border-gray-600">Chat</h1>
+      <h1 className="p-5 border-b border-gray-600 flex justify-between capitalize">
+        {targetUser
+          ? targetUser?.firstName + " " + targetUser?.lastName
+          : "Chat"}
+        <div className="flex items-center gap-5 bg-gray-800 px-2 py-1 rounded-2xl">
+          <span>{isUserOnline(targetUserId) ? "Online" : "Offline"}</span>
+          {
+            <div
+              className={`w-3 h-3 rounded-full ${
+                isUserOnline(targetUserId)
+                  ? "bg-green-500 animate-ping"
+                  : "bg-gray-400"
+              }`}
+            />
+          }
+        </div>
+      </h1>
       <div className="flex-1 overflow-scroll p-5">
         {messages.map((msg, index) => {
           return (

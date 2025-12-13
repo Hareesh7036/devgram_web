@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 
 function Connections() {
   const connections = useSelector((store: RootState) => store.connections);
+  const onlineUsers = useSelector((store: RootState) => store.onlineUsers);
+
   const dispatch = useDispatch();
   const getConnections = async () => {
     try {
@@ -31,11 +33,18 @@ function Connections() {
       </div>
     );
   }
+
+  function isUserOnline(userId: string) {
+    return onlineUsers.data.includes(userId);
+  }
   return (
     <div>
       {connections.data.map((connection) => {
         return (
-          <div className="card card-side bg-base-300 shadow-sm w-1/2 mx-auto my-5 rounded-2xl flex">
+          <div
+            key={connection._id}
+            className="card card-side bg-base-300 shadow-sm w-1/2 mx-auto my-5 rounded-2xl flex"
+          >
             <figure className="pl-[30px] py-[30px]">
               <img
                 src={connection.photoUrl}
@@ -44,8 +53,24 @@ function Connections() {
               />
             </figure>
             <div className="card-body flex-1">
-              <h2 className="card-title capitalize">
-                {connection.firstName} {connection.lastName}
+              <h2 className="card-title capitalize flex items-center justify-between">
+                {connection.firstName} {connection.lastName}{" "}
+                {
+                  <div className="flex items-center gap-5 bg-gray-800 px-2 py-1 rounded-2xl">
+                    <span>
+                      {isUserOnline(connection._id) ? "Online" : "Offline"}
+                    </span>
+                    {
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          isUserOnline(connection._id)
+                            ? "bg-green-500 animate-ping"
+                            : "bg-gray-400"
+                        }`}
+                      />
+                    }
+                  </div>
+                }
               </h2>
               {connection.age && (
                 <p className="capitalize">
