@@ -200,8 +200,8 @@ const Chat = () => {
   if (!targetUserId) return null;
 
   return (
-    <div className="w-3/4 mx-auto border border-gray-600 m-5 h-[70vh] flex flex-col">
-      <h1 className="p-5 border-b border-gray-600 flex justify-between capitalize">
+    <div className="w-3/4 mx-auto border border-gray-600 m-5 h-[80vh] flex flex-col rounded-2xl">
+      <h1 className="p-5 border-b border-gray-600 flex justify-between capitalize bg-base-300 rounded-tl-2xl rounded-tr-2xl">
         {targetUser
           ? targetUser?.firstName + " " + targetUser?.lastName
           : "Chat"}
@@ -240,11 +240,18 @@ const Chat = () => {
           );
         })}
       </div>
-      <div className="p-5 border-t border-gray-600 flex items-center gap-2">
+      <div className="p-5 border-t border-gray-600 flex items-center gap-2 bg-base-300 rounded-bl-2xl rounded-br-2xl">
         <input
+          name="chatText"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 border border-gray-500 text-white rounded p-2"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault(); // optional, stops form submit / newline
+              sendMessage();
+            }
+          }}
+          className="flex-1 border border-gray-500 rounded p-2 w-full input input-secondary"
         ></input>
         <button onClick={sendMessage} className="btn btn-secondary">
           Send
