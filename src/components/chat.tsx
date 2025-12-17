@@ -11,6 +11,8 @@ type MessageType = {
   firstName: string | null;
   lastName: string | null;
   text: string | null;
+  messageId: string | null;
+  chatId: string | null;
 };
 
 const Chat = () => {
@@ -18,6 +20,11 @@ const Chat = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [targetUser, setTargetUser] = useState<User>();
+  const [seenMsgId, setSeenMsgId] = useState<string>("");
+  const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+  const [pendingDelivered, setPendingDelivered] = useState<
+    { senderId: string; messageId: string; chatId: string }[]
+  >([]);
   const user = useSelector((store: RootState) => store.user);
   const userId = user?._id;
   const onlineUsers = useSelector((store: RootState) => store.onlineUsers);
@@ -28,21 +35,35 @@ const Chat = () => {
     const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
       withCredentials: true,
     });
-
     const chatMessages = chat?.data?.messages.map(
       (msg: {
-        senderId: { firstName: string; lastName: string };
+        senderId: { firstName: string; lastName: string; _id: string };
         text: string;
+        seenBy: string[];
+        _id: string;
       }) => {
-        const { senderId, text } = msg;
+        const { senderId, text, seenBy } = msg;
         return {
           firstName: senderId?.firstName,
           lastName: senderId?.lastName,
+          senderId: senderId._id,
           text,
+          seenBy,
+          messageId: msg._id,
         };
       }
     );
     setMessages(chatMessages);
+    for (let i = chatMessages.length - 1; i >= 0; i--) {
+      const msg = chatMessages[i];
+      console.log("Checking message for seen status:", msg);
+      console.log(userId);
+      if (msg.senderId === userId && msg?.seenBy?.includes(targetUserId)) {
+        console.log("Setting seenMsgId to", msg.messageId);
+        setSeenMsgId(msg.messageId);
+        break;
+      }
+    }
   };
 
   const fetchTargetUser = async () => {
@@ -54,10 +75,19 @@ const Chat = () => {
     }
   };
 
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+
+    const atBottom = Math.abs(scrollHeight - clientHeight - scrollTop) < 1;
+
+    setIsAtBottom(atBottom);
+  };
+
   useEffect(() => {
     fetchChatMessages();
     fetchTargetUser();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (!userId) {
@@ -72,15 +102,64 @@ const Chat = () => {
 
     socket?.on(
       "messageReceived",
-      ({ firstName, lastName, text }: MessageType) => {
-        console.log("Message received:", { firstName, lastName, text });
-        setMessages((messages) => [...messages, { firstName, lastName, text }]);
+      ({ firstName, lastName, text, messageId, chatId, senderId }: any) => {
+        console.log("Message received:", {
+          firstName,
+          lastName,
+          text,
+          messageId,
+          chatId,
+          senderId,
+        });
+        setMessages((messages) => [
+          ...messages,
+          { firstName, lastName, text, messageId, chatId },
+        ]);
+        console.log("userId", userId, "senderId", senderId);
+        if (senderId !== userId) {
+          console.log("Adding to pendingDelivered", {
+            messageId,
+            chatId,
+            senderId,
+          });
+          setPendingDelivered((prev) => [
+            ...prev,
+            { senderId, messageId, chatId },
+          ]);
+        }
       }
     );
+    socket?.on("messageSeen", ({ messageId, seenBy }) => {
+      console.log("seenmsgId", messageId, seenBy);
+      setSeenMsgId(messageId);
+    });
     socket?.on("errorMessage", ({ code, message }) => {
       console.error(code, message);
     });
   }, [userId, targetUserId, socket]);
+
+  useEffect(() => {
+    if (!socket || !userId) return;
+    if (!isAtBottom) return;
+    if (pendingDelivered.length === 0) return;
+
+    // Fire delivered for all pending messages when user reaches bottom
+    console.log("Emitting messageDelivered for pending messages");
+
+    pendingDelivered.forEach(({ senderId, messageId, chatId }) => {
+      // if (senderId !== userId) {
+      socket.emit("messageDelivered", {
+        targetUserId: senderId,
+        currentUserId: userId,
+        messageId,
+        chatId,
+      });
+      // }
+    });
+
+    // Clear pending list after emitting
+    setPendingDelivered([]);
+  }, [isAtBottom, pendingDelivered, socket, userId]);
 
   const sendMessage = () => {
     socket?.emit("sendMessage", {
@@ -97,6 +176,8 @@ const Chat = () => {
     return onlineUsers.data.includes(userId);
   }
 
+  console.log("messages", messages);
+  console.log("pendingDelivered", pendingDelivered);
   if (!targetUserId) return null;
 
   return (
@@ -118,7 +199,7 @@ const Chat = () => {
           }
         </div>
       </h1>
-      <div className="flex-1 overflow-scroll p-5">
+      <div className="flex-1 overflow-scroll p-5" onScroll={handleScroll}>
         {messages.map((msg, index) => {
           return (
             <div
@@ -133,7 +214,9 @@ const Chat = () => {
                 <time className="text-xs opacity-50"> 2 hours ago</time>
               </div>
               <div className="chat-bubble">{msg.text}</div>
-              <div className="chat-footer opacity-50">Seen</div>
+              {msg.messageId === seenMsgId && (
+                <div className="chat-footer opacity-50">Seen</div>
+              )}
             </div>
           );
         })}
