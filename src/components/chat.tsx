@@ -25,6 +25,7 @@ const Chat = () => {
   const [pendingDelivered, setPendingDelivered] = useState<
     { senderId: string; messageId: string; chatId: string }[]
   >([]);
+
   const user = useSelector((store: RootState) => store.user);
   const userId = user?._id;
   const onlineUsers = useSelector((store: RootState) => store.onlineUsers);
@@ -35,6 +36,7 @@ const Chat = () => {
     const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
       withCredentials: true,
     });
+    const chatId = chat?.data?._id;
     const chatMessages = chat?.data?.messages.map(
       (msg: {
         senderId: { firstName: string; lastName: string; _id: string };
@@ -56,13 +58,41 @@ const Chat = () => {
     setMessages(chatMessages);
     for (let i = chatMessages.length - 1; i >= 0; i--) {
       const msg = chatMessages[i];
-      console.log("Checking message for seen status:", msg);
-      console.log(userId);
       if (msg.senderId === userId && msg?.seenBy?.includes(targetUserId)) {
-        console.log("Setting seenMsgId to", msg.messageId);
         setSeenMsgId(msg.messageId);
         break;
       }
+    }
+    for (let i = chatMessages.length - 1; i >= 0; i--) {
+      const msg = chatMessages[i];
+      if (msg.senderId !== userId) {
+        if (!msg?.seenBy?.includes(userId!)) {
+          await updateMessageSeen(msg.messageId!, chatId);
+          setPendingDelivered((prev) => [
+            ...prev,
+            { senderId: msg.senderId!, messageId: msg.messageId!, chatId },
+          ]);
+          break;
+        } else {
+          break;
+        }
+      }
+    }
+  };
+
+  const updateMessageSeen = async (messageId: string, chatId: string) => {
+    try {
+      await axios.post(
+        `${BASE_URL}/chat/${chatId}/markSeen`,
+        {
+          messageId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+    } catch (err) {
+      console.error("Error updating message seen status:", err);
     }
   };
 
@@ -115,13 +145,8 @@ const Chat = () => {
           ...messages,
           { firstName, lastName, text, messageId, chatId },
         ]);
-        console.log("userId", userId, "senderId", senderId);
+
         if (senderId !== userId) {
-          console.log("Adding to pendingDelivered", {
-            messageId,
-            chatId,
-            senderId,
-          });
           setPendingDelivered((prev) => [
             ...prev,
             { senderId, messageId, chatId },
@@ -129,8 +154,7 @@ const Chat = () => {
         }
       }
     );
-    socket?.on("messageSeen", ({ messageId, seenBy }) => {
-      console.log("seenmsgId", messageId, seenBy);
+    socket?.on("messageSeen", ({ messageId }) => {
       setSeenMsgId(messageId);
     });
     socket?.on("errorMessage", ({ code, message }) => {
@@ -143,18 +167,15 @@ const Chat = () => {
     if (!isAtBottom) return;
     if (pendingDelivered.length === 0) return;
 
-    // Fire delivered for all pending messages when user reaches bottom
-    console.log("Emitting messageDelivered for pending messages");
+    // Fire delivered for all pending messages when user is at bottom
 
     pendingDelivered.forEach(({ senderId, messageId, chatId }) => {
-      // if (senderId !== userId) {
       socket.emit("messageDelivered", {
         targetUserId: senderId,
         currentUserId: userId,
         messageId,
         chatId,
       });
-      // }
     });
 
     // Clear pending list after emitting
@@ -176,8 +197,6 @@ const Chat = () => {
     return onlineUsers.data.includes(userId);
   }
 
-  console.log("messages", messages);
-  console.log("pendingDelivered", pendingDelivered);
   if (!targetUserId) return null;
 
   return (
