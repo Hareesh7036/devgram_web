@@ -27,14 +27,16 @@ function NavBar() {
   return (
     <div className="navbar bg-base-300 shadow-sm sticky top-0 z-10">
       <div className="flex-1">
-        <a className="btn btn-ghost text-lg md:text-xl text-nowrap">
+        <a className="btn btn-ghost text-[16px] md:text-xl text-nowrap">
           🧑‍💻 Devgram
         </a>
       </div>
       {!!user && (
         <div className="flex gap-2 items-center">
           {user.firstName && (
-            <p className="capitalize">Welcome {user.firstName}!</p>
+            <p className="capitalize text-[14px] md:text-[16px]">
+              Welcome {user.firstName}!
+            </p>
           )}
           <div className="dropdown dropdown-end mx-2 md:mx-4">
             <div

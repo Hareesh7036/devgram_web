@@ -200,16 +200,16 @@ const Chat = () => {
   if (!targetUserId) return null;
 
   return (
-    <div className="w-3/4 mx-auto border border-gray-600 m-5 h-[80vh] flex flex-col rounded-2xl">
+    <div className="w-9/10 md:w-3/4 mx-auto border border-gray-600 m-5 h-[80vh] flex flex-col rounded-2xl">
       <h1 className="p-5 border-b border-gray-600 flex justify-between capitalize bg-base-300 rounded-tl-2xl rounded-tr-2xl">
         {targetUser
           ? targetUser?.firstName + " " + targetUser?.lastName
           : "Chat"}
-        <div className="flex items-center gap-5 bg-gray-800 px-2 py-1 rounded-2xl">
+        <div className="flex items-center gap-5 bg-gray-800 px-2 py-1 rounded-2xl text-[14px] md:text-[16px]">
           <span>{isUserOnline(targetUserId) ? "Online" : "Offline"}</span>
           {
             <div
-              className={`w-3 h-3 rounded-full ${
+              className={`w-2 md:w-3 h-2 md:h-3 rounded-full ${
                 isUserOnline(targetUserId)
                   ? "bg-green-500 animate-ping"
                   : "bg-gray-400"
@@ -251,9 +251,9 @@ const Chat = () => {
               sendMessage();
             }
           }}
-          className="flex-1 border border-gray-500 rounded p-2 w-full input input-secondary"
+          className="flex-1 border border-gray-500 rounded p-2 w-full input input-secondary h-8 md:h-10"
         ></input>
-        <button onClick={sendMessage} className="btn btn-secondary">
+        <button onClick={sendMessage} className="btn btn-secondary h-8 md:h-10">
           Send
         </button>
       </div>

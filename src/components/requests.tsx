@@ -50,8 +50,11 @@ function Requests() {
       {requests.data.map((request) => {
         const user = request.fromUserId;
         return (
-          <div className="card card-side bg-base-300 shadow-sm w-1/2 mx-auto my-5 rounded-2xl flex">
-            <figure className="pl-[30px] py-[30px]">
+          <div
+            className="card card-side bg-base-300 shadow-sm w-9/10 md:w-1/2 mx-auto my-5 rounded-2xl flex flex-col md:flex-row"
+            key={request._id}
+          >
+            <figure className="p-4 md:pl-[30px] py-[30px]">
               <img
                 src={user.photoUrl}
                 alt="connection image"

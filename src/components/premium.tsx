@@ -59,7 +59,7 @@ const Premium = () => {
   };
 
   return isUserPremium ? (
-    <div className="m-10">
+    <div className="m-8">
       <div className="card bg-gradient-to-r from-primary to-secondary shadow-2xl border-0 max-w-2xl mx-auto">
         <div className="card-body items-center text-center p-12">
           <div className="w-24 h-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 flex items-center justify-center bg-base-100 p-2">
@@ -96,7 +96,7 @@ const Premium = () => {
       </div>
     </div>
   ) : (
-    <div className="m-10">
+    <div className="m-4 md:m-10">
       <div className="hero min-h-[400px] bg-base-200 rounded-2xl mb-8">
         <div className="hero-content text-center">
           <div className="max-w-md">
@@ -110,7 +110,7 @@ const Premium = () => {
         </div>
       </div>
 
-      <div className="flex w-full gap-8">
+      <div className="flex w-full gap-8 flex-col md:flex-row justify-center items-stretch">
         <div className="card bg-gradient-to-br from-silver to-gray-400 shadow-2xl border-0 flex-grow transform hover:scale-[1.02] transition-all duration-300">
           <div className="card-body items-center text-center p-8">
             <div className="badge badge-lg badge-secondary mb-4 px-6 py-3">
@@ -187,7 +187,7 @@ const Premium = () => {
           </div>
         </div>
 
-        <div className="divider divider-horizontal">OR</div>
+        <div className="divider divider-vertical md:divider-horizontal">OR</div>
 
         <div className="card bg-gradient-to-br from-yellow-500 to-orange-500 shadow-2xl border-0 flex-grow transform hover:scale-[1.02] transition-all duration-300">
           <div className="card-body items-center text-center p-8">

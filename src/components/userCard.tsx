@@ -7,9 +7,10 @@ import { removeUserFromFeed } from "../utils/feedSlice";
 type Props = {
   user: User;
   isProfileOverview?: boolean;
+  className?: string;
 };
 
-function UserCard({ user, isProfileOverview }: Props) {
+function UserCard({ user, isProfileOverview, className }: Props) {
   const dispatch = useDispatch();
   const handleSendRequest = async (status: string, userId: string) => {
     try {
@@ -24,8 +25,10 @@ function UserCard({ user, isProfileOverview }: Props) {
     }
   };
   return (
-    <div className="card bg-base-300 w-96 shadow-sm transform transition-all duration-1000 ease-out  will-change-transform">
-      <figure className="px-10 pt-10">
+    <div
+      className={`card bg-base-300 md:w-96 shadow-sm transform transition-all duration-1000 ease-out  will-change-transform ${className}`}
+    >
+      <figure className="px-7 md:px-10 pt-7 md:pt-10">
         <img
           src={
             user?.photoUrl ??

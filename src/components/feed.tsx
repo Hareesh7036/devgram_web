@@ -35,7 +35,7 @@ function Feed() {
     <div className="flex justify-center p-6">
       {!!feed.data.length && (
         <div
-          key={feed.data[0]._id} // ← KEY FIX: unique key prevents remount
+          key={feed.data[0]._id}
           className="transform transition-all duration-1000 ease-out hover:scale-105"
           style={{
             transform: `translateY(0px) rotateX(0deg)`,

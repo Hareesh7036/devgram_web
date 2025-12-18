@@ -47,7 +47,6 @@ const EditProfile = ({ user }: { user: User }) => {
       dispatch(addUser(res.data));
       setShowToast(true);
       setTimeout(() => {
-        console.log("Hiding toast");
         setShowToast(false);
       }, 3000);
     } catch (err) {
@@ -72,8 +71,8 @@ const EditProfile = ({ user }: { user: User }) => {
   };
   return (
     <>
-      <div className="flex justify-center my-16 gap-3">
-        <div className="card bg-base-300 w-96 shadow-xl">
+      <div className="flex justify-center items-center my-16 gap-3 flex-col md:flex-row">
+        <div className="card bg-base-300 w-9/10 md:w-96 shadow-xl">
           <div className="card-body">
             <h2 className="card-title justify-center">Edit Profile</h2>
             <div className="flex flex-col">
@@ -209,6 +208,7 @@ const EditProfile = ({ user }: { user: User }) => {
             skills,
           }}
           isProfileOverview={true}
+          className="w-9/10"
         />
       </div>
       {showToast && (
