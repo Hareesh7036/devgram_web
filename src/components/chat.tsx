@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -25,6 +25,10 @@ const Chat = () => {
   const [pendingDelivered, setPendingDelivered] = useState<
     { senderId: string; messageId: string; chatId: string }[]
   >([]);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const [initialPageLoaded, setInitialPageLoaded] = useState<boolean>(false);
 
   const user = useSelector((store: RootState) => store.user);
   const userId = user?._id;
@@ -33,11 +37,21 @@ const Chat = () => {
   const socket = getSocket();
 
   const fetchChatMessages = async () => {
-    const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
-      withCredentials: true,
-    });
-    const chatId = chat?.data?._id;
-    const chatMessages = chat?.data?.messages.map(
+    if (!targetUserId || !userId || !page || !listRef.current) return;
+
+    const el = listRef.current;
+    const prevScrollHeight = el.scrollHeight;
+    const {
+      data: { chat, pagination },
+    } = await axios.get(
+      `${BASE_URL}/chat/${targetUserId}?page=${page}&limit=10`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    const chatId = chat?._id;
+    const chatMessages = chat?.messages.map(
       (msg: {
         senderId: { firstName: string; lastName: string; _id: string };
         text: string;
@@ -55,28 +69,40 @@ const Chat = () => {
         };
       }
     );
-    setMessages(chatMessages);
-    for (let i = chatMessages.length - 1; i >= 0; i--) {
-      const msg = chatMessages[i];
-      if (msg.senderId === userId && msg?.seenBy?.includes(targetUserId)) {
-        setSeenMsgId(msg.messageId);
-        break;
-      }
-    }
-    for (let i = chatMessages.length - 1; i >= 0; i--) {
-      const msg = chatMessages[i];
-      if (msg.senderId !== userId) {
-        if (!msg?.seenBy?.includes(userId!)) {
-          await updateMessageSeen(msg.messageId!, chatId);
-          setPendingDelivered((prev) => [
-            ...prev,
-            { senderId: msg.senderId!, messageId: msg.messageId!, chatId },
-          ]);
-          break;
-        } else {
+    setMessages((prevMessages) => [...chatMessages, ...prevMessages]);
+    setHasMore(pagination.hasMore);
+    if (page === 1) {
+      setInitialPageLoaded(true);
+
+      for (let i = chatMessages.length - 1; i >= 0; i--) {
+        const msg = chatMessages[i];
+        if (msg.senderId === userId && msg?.seenBy?.includes(targetUserId)) {
+          setSeenMsgId(msg.messageId);
           break;
         }
       }
+      for (let i = chatMessages.length - 1; i >= 0; i--) {
+        const msg = chatMessages[i];
+        if (msg.senderId !== userId) {
+          if (!msg?.seenBy?.includes(userId!)) {
+            await updateMessageSeen(msg.messageId!, chatId);
+            setPendingDelivered((prev) => [
+              ...prev,
+              { senderId: msg.senderId!, messageId: msg.messageId!, chatId },
+            ]);
+            break;
+          } else {
+            break;
+          }
+        }
+      }
+    } else {
+      requestAnimationFrame(() => {
+        if (!listRef.current) return;
+        const newScrollHeight = listRef.current.scrollHeight;
+        const diff = newScrollHeight - prevScrollHeight;
+        listRef.current.scrollTop = listRef.current.scrollTop + diff;
+      });
     }
   };
 
@@ -112,12 +138,18 @@ const Chat = () => {
     const atBottom = Math.abs(scrollHeight - clientHeight - scrollTop) < 1;
 
     setIsAtBottom(atBottom);
+    if (scrollTop === 0 && hasMore) {
+      setPage((prevPage) => prevPage + 1);
+    }
   };
 
   useEffect(() => {
     fetchChatMessages();
+  }, [userId, targetUserId, page]);
+
+  useEffect(() => {
     fetchTargetUser();
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     if (!userId) {
@@ -182,6 +214,15 @@ const Chat = () => {
     setPendingDelivered([]);
   }, [isAtBottom, pendingDelivered, socket, userId]);
 
+  useEffect(() => {
+    if (!initialPageLoaded || !listRef.current || page !== 1) return;
+
+    requestAnimationFrame(() => {
+      if (!listRef.current) return;
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    });
+  }, [initialPageLoaded, messages.length]);
+
   const sendMessage = () => {
     socket?.emit("sendMessage", {
       firstName: user.firstName,
@@ -191,6 +232,10 @@ const Chat = () => {
       text: newMessage,
     });
     setNewMessage("");
+    requestAnimationFrame(() => {
+      if (!listRef.current) return;
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    });
   };
 
   function isUserOnline(userId: string) {
@@ -218,7 +263,11 @@ const Chat = () => {
           }
         </div>
       </h1>
-      <div className="flex-1 overflow-scroll p-5" onScroll={handleScroll}>
+      <div
+        ref={listRef}
+        className="flex-1 overflow-scroll p-5"
+        onScroll={handleScroll}
+      >
         {messages.map((msg, index) => {
           return (
             <div
