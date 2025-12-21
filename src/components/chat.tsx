@@ -13,6 +13,7 @@ type MessageType = {
   text: string | null;
   messageId: string | null;
   chatId: string | null;
+  createdAt: string;
 };
 
 const Chat = () => {
@@ -57,11 +58,13 @@ const Chat = () => {
         text: string;
         seenBy: string[];
         _id: string;
+        createdAt: string;
       }) => {
-        const { senderId, text, seenBy } = msg;
+        const { senderId, text, seenBy, createdAt } = msg;
         return {
           firstName: senderId?.firstName,
           lastName: senderId?.lastName,
+          createdAt,
           senderId: senderId._id,
           text,
           seenBy,
@@ -164,7 +167,15 @@ const Chat = () => {
 
     socket?.on(
       "messageReceived",
-      ({ firstName, lastName, text, messageId, chatId, senderId }: any) => {
+      ({
+        firstName,
+        lastName,
+        text,
+        messageId,
+        chatId,
+        senderId,
+        createdAt,
+      }: any) => {
         console.log("Message received:", {
           firstName,
           lastName,
@@ -172,10 +183,11 @@ const Chat = () => {
           messageId,
           chatId,
           senderId,
+          createdAt,
         });
         setMessages((messages) => [
           ...messages,
-          { firstName, lastName, text, messageId, chatId },
+          { firstName, lastName, text, messageId, chatId, createdAt },
         ]);
 
         if (senderId !== userId) {
@@ -242,6 +254,22 @@ const Chat = () => {
     return onlineUsers.data.includes(userId);
   }
 
+  const formatTimeAgo = (createdAt: string) => {
+    const now = new Date();
+    const created = new Date(createdAt);
+    const diffMs = now.getTime() - created.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 60) {
+      return `${diffMinutes}m ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours}h ago`;
+    } else {
+      return `${diffDays}d ago`;
+    }
+  };
   if (!targetUserId) return null;
 
   return (
@@ -279,7 +307,9 @@ const Chat = () => {
             >
               <div className="chat-header">
                 {`${msg.firstName}  ${msg.lastName}`}
-                <time className="text-xs opacity-50"> 2 hours ago</time>
+                <time className="text-xs opacity-50">
+                  {formatTimeAgo(msg.createdAt)}
+                </time>
               </div>
               <div className="chat-bubble">{msg.text}</div>
               {msg.messageId === seenMsgId && (
