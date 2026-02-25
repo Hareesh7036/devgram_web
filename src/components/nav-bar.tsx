@@ -25,11 +25,22 @@ function NavBar() {
     }
   };
   return (
-    <div className="navbar bg-base-300 shadow-sm sticky top-0 z-10">
-      <div className="flex-1">
-        <a className="btn btn-ghost text-[16px] md:text-xl text-nowrap">
-          🧑‍💻 Devgram
-        </a>
+    <div className="navbar bg-base-300 shadow-sm sticky top-0 z-10 px-4">
+      <div className="flex-1 flex justify-start">
+        <Link
+          to="/"
+          className="btn btn-ghost hover:bg-transparent flex items-center gap-2 group p-0 px-2"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-primary-content shadow-lg transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
+            <i className="fas fa-terminal text-lg"></i>
+          </div>
+          <span className="text-xl md:text-2xl font-black tracking-tighter flex items-center transition-all duration-300">
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              DEV
+            </span>
+            <span className="text-base-content opacity-90">GRAM</span>
+          </span>
+        </Link>
       </div>
       {!!user && (
         <div className="flex gap-2 items-center">

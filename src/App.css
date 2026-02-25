@@ -2,16 +2,7 @@
   backface-visibility: hidden;
   will-change: transform;
 }
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+
 @keyframes cardFlipUp {
   0% {
     transform: translateY(100px) rotateX(90deg) scale(0.95);

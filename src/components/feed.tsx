@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../utils/appStore";
 import { setFeed } from "../utils/feedSlice";
 import UserCard from "./userCard";
+import UsageSection from "./usage-section";
 
 function Feed() {
   const feed = useSelector((store: RootState) => store.feed);
@@ -24,27 +25,38 @@ function Feed() {
     getFeed();
   }, []);
 
-  if (feed.data.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <h2 className="text-2xl font-semibold">No Feed Available</h2>
-      </div>
-    );
-  }
   return (
-    <div className="flex justify-center p-6">
-      {!!feed.data.length && (
-        <div
-          key={feed.data[0]._id}
-          className="transform transition-all duration-1000 ease-out hover:scale-105"
-          style={{
-            transform: `translateY(0px) rotateX(0deg)`,
-            animation: "cardFlipUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
-          }}
-        >
-          <UserCard user={feed.data[0]} />
-        </div>
-      )}
+    <div className="flex flex-col items-center">
+      <div className="flex justify-center p-4 md:p-8 w-full max-w-4xl">
+        {feed.data.length === 0 ? (
+          <div className="card bg-base-200 border border-base-300 w-full animate-fadeIn shadow-inner">
+            <div className="card-body items-center text-center py-10">
+              <div className="w-16 h-16 rounded-full bg-base-300 flex items-center justify-center mb-4">
+                <i className="fas fa-users-slash text-2xl opacity-50"></i>
+              </div>
+              <h2 className="text-2xl font-bold">You've reached the end!</h2>
+              <p className="opacity-70 max-w-xs">
+                We've shown you all available developers for now. Check back later for new connections!
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div
+            key={feed.data[0]._id}
+            className="transform transition-all duration-1000 ease-out hover:scale-105"
+            style={{
+              transform: `translateY(0px) rotateX(0deg)`,
+              animation: "cardFlipUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+            }}
+          >
+            <UserCard user={feed.data[0]} />
+          </div>
+        )}
+      </div>
+
+      <div className="w-full border-t border-base-300 mt-4">
+        <UsageSection />
+      </div>
     </div>
   );
 }
