@@ -10,6 +10,9 @@ export interface User {
   about?: string;
   skills?: string[];
   photoUrl?: string;
+  relationStatus?: "new" | "ignored" | "interested" | "accepted" | "rejected";
+  hasPendingRequest?: boolean;
+  isConnected?: boolean;
 }
 
 const initialState: User | null = {

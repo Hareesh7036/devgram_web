@@ -1,29 +1,61 @@
 import axios from "axios";
 import type { User } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
+import { Link } from "react-router-dom";
+import { removeConnection } from "../utils/connectionSlice";
+import type { RootState } from "../utils/appStore";
 
 type Props = {
   user: User;
   isProfileOverview?: boolean;
   className?: string;
+  onRequestSuccess?: (userId: string, status: string) => void;
 };
 
-function UserCard({ user, isProfileOverview, className }: Props) {
+function UserCard({
+  user,
+  isProfileOverview,
+  className,
+  onRequestSuccess,
+}: Props) {
   const dispatch = useDispatch();
+  const connections = useSelector((store: RootState) => store.connections.data);
+  const isConnection =
+    user.isConnected === true ||
+    user.relationStatus === "accepted" ||
+    connections.some((connection) => connection._id === user._id);
+  const isPending =
+    !isConnection &&
+    (user.hasPendingRequest === true || user.relationStatus === "interested");
+
   const handleSendRequest = async (status: string, userId: string) => {
     try {
       await axios.post(
         BASE_URL + "/request/send/" + status + "/" + userId,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       dispatch(removeUserFromFeed(userId));
+      onRequestSuccess?.(userId, status);
     } catch (err) {
       console.error(err);
     }
   };
+
+  const handleRemoveConnection = async (userId: string) => {
+    try {
+      await axios.delete(BASE_URL + "/request/remove/" + userId, {
+        withCredentials: true,
+      });
+      dispatch(removeConnection(userId));
+      onRequestSuccess?.(userId, "removed");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div
       className={`card bg-base-300 md:w-96 shadow-sm transform transition-all duration-1000 ease-out  will-change-transform ${className}`}
@@ -54,8 +86,8 @@ function UserCard({ user, isProfileOverview, className }: Props) {
               {user.gender && <span>, {user.gender}</span>}
             </p>
           )}
-          {user.skills && user.skills.length > 0 && (
-            <div className="badge-group flex flex-wrap gap-2 animate-fadeIn">
+        {user.skills && user.skills.length > 0 && (
+          <div className="badge-group flex flex-wrap gap-2 animate-fadeIn">
               {user.skills.map((skill, index) => (
                 <span
                   key={index}
@@ -70,24 +102,52 @@ function UserCard({ user, isProfileOverview, className }: Props) {
         {!isProfileOverview && !!user._id && (
           <div className=" flex items-center text-center">
             <div className="flex card-actions items-center transform transition-all duration-300 hover:translate-y-[-2px]">
-              <button
-                className="btn btn-primary transition-all duration-200 hover:scale-105"
-                onClick={() => {
-                  if (!user._id) return;
-                  handleSendRequest("ignored", user._id);
-                }}
-              >
-                Ignore
-              </button>
-              <button
-                className="btn btn-secondary transition-all duration-200 hover:scale-105"
-                onClick={() => {
-                  if (!user._id) return;
-                  handleSendRequest("interested", user._id);
-                }}
-              >
-                Interested
-              </button>
+              {isConnection ? (
+                <>
+                  <Link to={`/chat/${user._id}`}>
+                    <button className="btn btn-primary transition-all duration-200 hover:scale-105">
+                      Chat
+                    </button>
+                  </Link>
+                  <button
+                    className="btn btn-warning transition-all duration-200 hover:scale-105"
+                    onClick={() => {
+                      if (!user._id) return;
+                      handleRemoveConnection(user._id);
+                    }}
+                  >
+                    Remove
+                  </button>
+                </>
+              ) : isPending ? (
+                <button
+                  className="btn btn-secondary transition-all duration-200"
+                  disabled
+                >
+                  Pending
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="btn btn-primary transition-all duration-200 hover:scale-105"
+                    onClick={() => {
+                      if (!user._id) return;
+                      handleSendRequest("ignored", user._id);
+                    }}
+                  >
+                    Ignore
+                  </button>
+                  <button
+                    className="btn btn-secondary transition-all duration-200 hover:scale-105"
+                    onClick={() => {
+                      if (!user._id) return;
+                      handleSendRequest("interested", user._id);
+                    }}
+                  >
+                    Interested
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}

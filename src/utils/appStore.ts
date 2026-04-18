@@ -4,6 +4,7 @@ import feedReducer from "./feedSlice";
 import connectionReducer from "./connectionSlice";
 import requestReducer from "./requestSlice";
 import onlineUsersReducer from "./onlineUsersSlice";
+import searchSelectionReducer from "./searchSelectionSlice";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     connections: connectionReducer,
     requests: requestReducer,
     onlineUsers: onlineUsersReducer,
+    searchSelection: searchSelectionReducer,
   },
 });
 

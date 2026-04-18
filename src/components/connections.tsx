@@ -2,7 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setConnections } from "../utils/connectionSlice";
+import { removeConnection, setConnections } from "../utils/connectionSlice";
 import type { RootState } from "../utils/appStore";
 import { Link } from "react-router-dom";
 
@@ -25,6 +25,17 @@ function Connections() {
   useEffect(() => {
     getConnections();
   }, []);
+
+  const handleRemoveConnection = async (userId: string) => {
+    try {
+      await axios.delete(BASE_URL + "/request/remove/" + userId, {
+        withCredentials: true,
+      });
+      dispatch(removeConnection(userId));
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   if (connections.data.length === 0) {
     return (
@@ -85,7 +96,12 @@ function Connections() {
                 <Link to={`/chat/${connection._id}`}>
                   <button className="btn btn-primary">Chat</button>
                 </Link>
-                <button className="btn btn-warning">Remove</button>
+                <button
+                  className="btn btn-warning"
+                  onClick={() => handleRemoveConnection(connection._id)}
+                >
+                  Remove
+                </button>
               </div>
             </div>
           </div>

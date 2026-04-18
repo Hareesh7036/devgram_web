@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface Connection {
   _id: string;
@@ -26,11 +26,17 @@ const connectionSlice = createSlice({
     setConnections: (state, action) => {
       state.data = action.payload;
     },
+    removeConnection: (state, action: PayloadAction<string>) => {
+      state.data = state.data.filter(
+        (connection) => connection._id !== action.payload
+      );
+    },
     clearConnections: (state) => {
       state.data = [];
     },
   },
 });
 
-export const { setConnections, clearConnections } = connectionSlice.actions;
+export const { setConnections, removeConnection, clearConnections } =
+  connectionSlice.actions;
 export default connectionSlice.reducer;
